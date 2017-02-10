@@ -1,6 +1,7 @@
 package solutions.hedron.android_locator.fragments;
 
 
+import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -19,6 +20,7 @@ import solutions.hedron.android_locator.R;
 public class MainFragment extends Fragment implements OnMapReadyCallback {
 
     private GoogleMap mMap;
+    private MarkerOptions userMarker;
 
     public MainFragment() {
         // Required empty public constructor
@@ -57,10 +59,13 @@ public class MainFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+    }
 
-        // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+    public void setUserMarkers(LatLng latLng){
+        if (userMarker == null){
+            userMarker = new MarkerOptions().position(latLng).title("Current Location");
+            mMap.addMarker(userMarker);
+        }
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
     }
 }
