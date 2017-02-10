@@ -1,12 +1,18 @@
 package solutions.hedron.android_locator.fragments;
 
 
+import android.content.Context;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -16,7 +22,10 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 import solutions.hedron.android_locator.R;
 import solutions.hedron.android_locator.models.MyLocation;
@@ -49,6 +58,27 @@ public class MainFragment extends Fragment implements OnMapReadyCallback {
         SupportMapFragment mapFragment = (SupportMapFragment)getChildFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        final EditText zipText = (EditText)view.findViewById(R.id.zipText);
+        zipText.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER){
+                    // Validate Zip Code - Check total count and characters
+                    String text = zipText.getText().toString();
+                    int zip = Integer.parseInt(text);
+
+                    InputMethodManager inputMethodManager = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    inputMethodManager.hideSoftInputFromWindow(zipText.getWindowToken(), 0);
+
+                    updateMapForZip(zip);
+                    return true;
+                }
+
+                return false;
+            }
+        });
+
         return view;
     }
 
@@ -72,6 +102,15 @@ public class MainFragment extends Fragment implements OnMapReadyCallback {
             userMarker.icon(BitmapDescriptorFactory.fromResource(R.drawable.map_marker_icon));
             mMap.addMarker(userMarker);
         }
+        try {
+            Geocoder geocoder = new Geocoder(getContext(), Locale.getDefault());
+            List<Address> addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
+            int zip = Integer.parseInt(addresses.get(0).getPostalCode());
+            updateMapForZip(zip);
+        } catch (IOException exception){
+
+        }
+
         updateMapForZip(1007);
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
     }
