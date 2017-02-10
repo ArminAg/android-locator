@@ -12,10 +12,15 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.ArrayList;
+
 import solutions.hedron.android_locator.R;
+import solutions.hedron.android_locator.models.MyLocation;
+import solutions.hedron.android_locator.services.DataService;
 
 public class MainFragment extends Fragment implements OnMapReadyCallback {
 
@@ -64,8 +69,23 @@ public class MainFragment extends Fragment implements OnMapReadyCallback {
     public void setUserMarkers(LatLng latLng){
         if (userMarker == null){
             userMarker = new MarkerOptions().position(latLng).title("Current Location");
+            userMarker.icon(BitmapDescriptorFactory.fromResource(R.drawable.map_marker_icon));
             mMap.addMarker(userMarker);
         }
+        updateMapForZip(1007);
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
+    }
+
+    private void updateMapForZip(int zipCode){
+        ArrayList<MyLocation> locations = DataService.getInstance().getLocationsWithin10MilesOfZip(zipCode);
+
+        for (int x = 0; x < locations.size(); x++){
+            MyLocation location = locations.get(x);
+            MarkerOptions markerOptions = new MarkerOptions().position(new LatLng(location.getLatitude(), location.getLongitude()));
+            markerOptions.title(location.getLocationTitle());
+            markerOptions.snippet(location.getLocationAddress());
+            markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.map_marker_icon));
+            mMap.addMarker(markerOptions);
+        }
     }
 }
