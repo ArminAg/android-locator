@@ -37,7 +37,8 @@
                     android:inputType="number"
                     android:id="@+id/zipText"
                     android:hint="@string/zip_hint"
-                    android:layout_centerHorizontal="true" />
+                    android:layout_centerHorizontal="true"
+                    android:background="@android:color/transparent" />
 
                 <ImageButton
                     android:layout_width="35dp"

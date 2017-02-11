@@ -1,6 +1,6 @@
 <resources>
-    <string name="app_name">Android Locator</string>
-    <string name="title_activity_maps">Map</string>
+    <string name="app_name">Locator</string>
+    <string name="title_activity_maps">Locator</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="zip_hint">Enter Zip Code</string>
