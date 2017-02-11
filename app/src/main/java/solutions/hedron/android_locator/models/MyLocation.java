@@ -5,6 +5,8 @@ package solutions.hedron.android_locator.models;
  */
 
 public class MyLocation {
+    final String DRAWABLE = "drawable/";
+
     private float latitude;
     private float longitude;
     private String locationTitle;
@@ -28,7 +30,7 @@ public class MyLocation {
     }
 
     public String getLocationImgUrl() {
-        return locationImgUrl;
+        return DRAWABLE + locationImgUrl;
     }
 
     public MyLocation(float latitude, float longitude, String locationTitle, String locationAddress, String locationImgUrl) {

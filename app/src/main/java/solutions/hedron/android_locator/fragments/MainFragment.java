@@ -7,6 +7,7 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -35,6 +36,7 @@ public class MainFragment extends Fragment implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     private MarkerOptions userMarker;
+    private LocationsListFragment locationsListFragment;
 
     public MainFragment() {
         // Required empty public constructor
@@ -59,6 +61,19 @@ public class MainFragment extends Fragment implements OnMapReadyCallback {
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        locationsListFragment = (LocationsListFragment)getActivity()
+                .getSupportFragmentManager()
+                .findFragmentById(R.id.container_locations_list);
+
+        if (locationsListFragment == null){
+            locationsListFragment = LocationsListFragment.newInstance();
+            getActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .add(R.id.container_locations_list, locationsListFragment)
+                    .commit();
+
+        }
+
         final EditText zipText = (EditText)view.findViewById(R.id.zipText);
         zipText.setOnKeyListener(new View.OnKeyListener() {
             @Override
@@ -70,7 +85,7 @@ public class MainFragment extends Fragment implements OnMapReadyCallback {
 
                     InputMethodManager inputMethodManager = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
                     inputMethodManager.hideSoftInputFromWindow(zipText.getWindowToken(), 0);
-
+                    showList();
                     updateMapForZip(zip);
                     return true;
                 }
@@ -78,7 +93,7 @@ public class MainFragment extends Fragment implements OnMapReadyCallback {
                 return false;
             }
         });
-
+        hideList();
         return view;
     }
 
@@ -106,6 +121,7 @@ public class MainFragment extends Fragment implements OnMapReadyCallback {
             Geocoder geocoder = new Geocoder(getContext(), Locale.getDefault());
             List<Address> addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
             int zip = Integer.parseInt(addresses.get(0).getPostalCode());
+
             updateMapForZip(zip);
         } catch (IOException exception){
 
@@ -126,5 +142,19 @@ public class MainFragment extends Fragment implements OnMapReadyCallback {
             markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.map_marker_icon));
             mMap.addMarker(markerOptions);
         }
+    }
+
+    private void hideList(){
+        getActivity().getSupportFragmentManager()
+                .beginTransaction()
+                .hide(locationsListFragment)
+                .commit();
+    }
+
+    private void showList(){
+        getActivity().getSupportFragmentManager()
+                .beginTransaction()
+                .show(locationsListFragment)
+                .commit();
     }
 }
